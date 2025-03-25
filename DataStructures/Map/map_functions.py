@@ -82,3 +82,31 @@ def hash_value(table, key):
 
     value = int((abs(a * h + b) % p) % m)
     return value
+
+def get_hash(table, key):
+    """
+    Calcula un hash para una llave, utilizando el método
+    MAD : hash_value(y) = ((a*y + b) % p) % M.
+
+    Donde:
+    M es el tamaño de la tabla, primo
+    p es un primo mayor a M,
+    a y b enteros aleatoreos dentro del intervalo [0,p-1], con a > 0
+
+    :param table: Tabla de hash
+    :type table: map
+    :param key: Llave a la que se le calculará el hash
+    :type key: any
+
+    :return: Valor del hash
+    :rtype int
+    """
+
+    h = hash(key)
+    a = table["scale"]
+    b = table["shift"]
+    p = table["prime"]
+    m = table["capacity"]
+
+    value = int((abs(a * h + b) % p) % m)
+    return value
