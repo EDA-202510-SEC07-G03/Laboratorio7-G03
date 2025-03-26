@@ -7,8 +7,8 @@ def new_map(num_elements, load_factor, prime=109345121):
     my_table =  al.new_list()
     my_table["prime"] = prime
     my_table["capacity"] = map.next_prime(num_elements/load_factor)
-    my_table["scale"] = 1
-    my_table["shift"] = 0
+    my_table["scale"] = m.randint(1, prime - 1)
+    my_table["shift"] = m.randint(0, prime - 1)
     my_table["table"] = al.new_list()
     for i in range(my_table["capacity"]):
         al.add_last(my_table["table"],sl.new_list())
@@ -20,26 +20,16 @@ def new_map(num_elements, load_factor, prime=109345121):
 def put(my_map, key, value):
     indice = map.hash_value(my_map, key)
     entry = al.get_element(my_map["table"], indice)
-    if entry["size"] == 0:
-        dicc = ent.new_map_entry(key, value)
-        sl.add_last(entry, dicc)
-        my_map["size"] += 1
-    elif entry["size"] > 0:
-        node = entry["first"]
-        i = 0
-        while i < entry["size"]:
-            llave = ent.get_key(node["info"])
-            if llave == key:
-                ent.set_value(node["info"], value)
-                i = entry["size"]
-            elif node["next"] == None:
-                dicc = ent.new_map_entry(key, value)
-                sl.add_last(entry, dicc)
-                my_map["size"] += 1
-                i = entry["size"]
-            node = node["next"]
-            i += 1
-    if my_map["size"] / my_map["capacity"] > my_map["limit factor"]:
+    node = entry["first"]
+    while node is not None:
+        if ent.get_key(node["info"]) == key:
+            ent.set_value(node["info"], value)
+            return my_map
+        node = node["next"]
+    dicc = ent.new_map_entry(key, value)
+    sl.add_last(entry, dicc)
+    my_map["size"] += 1
+    if my_map["size"] / my_map["capacity"] > my_map["limit_factor"]:
         rehash(my_map)
     return my_map
 
@@ -62,18 +52,26 @@ def contains(my_map, key):
 def remove(my_map, key):
     indice = map.hash_value(my_map, key)
     entry = al.get_element(my_map["table"], indice)
+    
     if entry["size"] == 0:
         return my_map
-    else:
-        node = entry["first"]
-        i = 0
-        while i < entry["size"] or node["next"] != None:
-            llave = ent.get_key(node["info"])
-            if llave == key:
-                sl.delete_element(entry, i)
-                my_map["size"] -= 1
-            node = node["next"]
-            i += 1
+
+    node = entry["first"]
+    previous = None
+
+    while node is not None:
+        if ent.get_key(node["info"]) == key:
+            if previous is None:
+                entry["first"] = node["next"]
+            else:
+                previous["next"] = node["next"]
+                
+            my_map["size"] -= 1
+            return my_map
+        
+        previous = node
+        node = node["next"]
+
     return my_map
 
 def get(my_map, key):
@@ -83,87 +81,66 @@ def get(my_map, key):
         retorno = None
     else:
         node = entry["first"]
-        i = 0
-        while i < entry["size"] or node["next"] != None:
-            llave = ent.get_key(node["info"])
-            if llave == key:
-                retorno = ent.get_value(llave)
-                i = entry["size"]
+        while node != None:
+            if ent.get_key(node["info"]) == key:
+                return ent.get_value(node["info"])
             node = node["next"]
-            i += 1
-    return retorno  
+    return None
 
 def size(my_map):
     return my_map["size"]
 
 def is_empty(my_map):
-    retorno = False
-    while retorno == False:
-        for i in range(my_map["size"]):
-            entry = my_map["table"][i]
-            if entry["size"] != 0:
-                node = entry["first"]
-                i = 0
-                while i < entry["size"] or node["next"] != None:
-                    llave = ent.get_key(node["info"])
-                    if llave == None:
-                        retorno = False
-                    else:
-                        retorno = True
-                        i = entry["size"]
-                i += 1
-                node = node["next"]
-    return retorno
+    if my_map["size"] == 0:
+        return True
+    return False
 
 def key_set(my_map):
-    lista_retorno = al.new_list()
-    for i in range(my_map["size"]):
-        entry = my_map["table"][i]
-        if entry["size"] != 0:
-            node = entry["first"]
-            i = 0
-            while i < entry["size"] or node["next"] != None:
-                llave = ent.get_key(node["info"])
-                if llave != None:
-                    al.add_first(lista_retorno, llave)
-                i += 1
-                node = node["next"]
-    return lista_retorno
+    lista_claves = al.new_list()
+    
+    for i in range(my_map["capacity"]):
+        entry = my_map["table"]["elements"][i]
+        node = entry["first"]
+        while node is not None:
+            clave = ent.get_key(node["info"])
+            al.add_first(lista_claves, clave)
+            node = node["next"]
+    
+    return lista_claves
 
 def value_set(my_map):
     lista_retorno = al.new_list()
-    for i in range(my_map["size"]):
-        entry = my_map["table"][i]
-        if entry["size"] != 0:
-            node = entry["first"]
-            i = 0
-            while i < entry["size"] or node["next"] != None:
-                valor = ent.get_value(node["info"])
-                if valor != None:
+    for i in range(my_map["capacity"]):
+        entry = my_map["table"]["elements"][i]
+        node = entry["first"]
+        while node != None:
+            valor = ent.get_value(node["info"])
+            if valor != None:
                     al.add_first(lista_retorno, valor)
-                i += 1
-                node = node["next"]
+            node = node["next"]
     return lista_retorno
 
 def rehash(my_map):
+    old_table = my_map["table"]
     new_capacity = map.next_prime(my_map["capacity"] * 2)
     new_table = al.new_list()
-    old_table = my_map["table"]
+    
     for i in range(new_capacity):
         al.add_last(new_table, sl.new_list())
+    
     my_map["table"] = new_table
-    my_map["capcity"] = new_capacity
+    my_map["capacity"] = new_capacity
     my_map["size"] = 0
-    for i in range (old_table["size"]):
-        entry = old_table[i]
-        if entry["size"] != 0:
-            node = entry["first"]
-            while node["next"] != None:
-                if node["info"] != None:
-                    llave = ent.get_key(node["info"])
-                    valor = ent.get_value(node["info"])
-                    put(my_map, llave, valor)
-                node = node["next"]
+    
+    for i in range(len(old_table["elements"])):
+        entry = old_table["elements"][i]
+        node = entry["first"]
+        while node is not None:
+            llave = ent.get_key(node["info"])
+            valor = ent.get_value(node["info"])
+            put(my_map, llave, valor)
+            node = node["next"]
+    
     return my_map
                     
     
