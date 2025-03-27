@@ -31,9 +31,6 @@ import tracemalloc
 from DataStructures.Map import map_linear_probing as lp
 from DataStructures.Map import map_separate_chaining as sc
 from DataStructures.List import array_list as al
-from DataStructures.Map import map_linear_probing as lp
-from DataStructures.Map import map_separate_chaining as sc
-from DataStructures.List import array_list as al
 
 
 # TODO Realice la importación del mapa linear probing
@@ -62,20 +59,20 @@ def new_logic():
 
     #Tabla de Hash que contiene los libros indexados por good_reads_book_id  
     #(good_read_id -> book)
-    catalog['books_by_id'] = lp.new_map(1000,0.7) #TODO completar la creación del mapa
+    catalog['books_by_id'] = lp.new_map(1000,0.9) #TODO completar la creación del mapa
 
     #Tabla de Hash con la siguiente pareja llave valor: (author_name -> List(books))
-    catalog['books_by_authors'] = lp.new_map(1000,0.7) #TODO completar la creación del mapa
+    catalog['books_by_authors'] = lp.new_map(1000,0.9) #TODO completar la creación del mapa
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_name -> tag)
-    catalog['tags'] = lp.new_map(1000,0.7) #TODO completar la creación del mapa
+    catalog['tags'] = lp.new_map(1000,0.9) #TODO completar la creación del mapa
 
     #Tabla de Hash con la siguiente pareja llave valor: (tag_id -> book_tags)
-    catalog['book_tags'] = lp.new_map(1000,0.7)
+    catalog['book_tags'] = lp.new_map(1000,0.9)
 
     #Tabla de Hash principal que contiene sub-mapas dentro de los valores
     #con la siguiente representación de la pareja llave valor: (author_name -> (original_publication_year -> list(books)))
-    catalog['books_by_year_author'] = lp.new_map(1000,0.7) #TODO completar la creación del mapa
+    catalog['books_by_year_author'] = lp.new_map(1000,0.9) #TODO completar la creación del mapa
     
     return catalog
 
@@ -86,13 +83,25 @@ def new_logic():
 #TODO: incorporar las funciones para toma de tiempo y memoria
 def load_data(catalog):
     """
-    Carga los datos de los archivos y cargar los datos en la
-    estructura de datos
+    Carga los datos de los archivos y carga los datos en la estructura de datos
     """
+    start_time = getTime()
+    tracemalloc.start()
+    start_memory = getMemory()
+
     books, authors = load_books(catalog)
     tag_size = load_tags(catalog)
     book_tag_size = load_books_tags(catalog)
-    return books, authors,tag_size,book_tag_size
+
+    stop_memory = getMemory()
+    end_time = getTime()
+
+    tiempo_transcurrido = deltaTime(end_time, start_time)
+    memoria_usada = deltaMemory(start_memory, stop_memory)
+
+    return books, authors, tag_size, book_tag_size, tiempo_transcurrido, memoria_usada
+
+
 
 
 def load_books(catalog):

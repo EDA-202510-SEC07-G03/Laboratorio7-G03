@@ -172,8 +172,8 @@ def main():
 
         elif int(inputs[0]) == 3:
             authorname = input("Nombre del autor a buscar: ")
-            author, author_book_list, tiempo_transcurrido, memoria_usada = logic.get_books_by_author(control, authorname)
-            print_books_by_author(author,author_book_list, tiempo_transcurrido, memoria_usada)
+            author_book_list, tiempo_transcurrido, memoria_usada = logic.get_books_by_author(control, authorname)
+            print_books_by_author(authorname,author_book_list, tiempo_transcurrido, memoria_usada)
 
         elif int(inputs[0]) == 4:
             label = input("Etiqueta a buscar: ")
