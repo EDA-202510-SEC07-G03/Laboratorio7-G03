@@ -26,9 +26,10 @@
 
 import sys
 import App.logic as logic
-# TODO Realice la importación del mapa linear probing
+from DataStructures.Map import map_linear_probing as lp
+from DataStructures.List import array_list as al
 # TODO Realice la importación de ArrayList como estructura de datos auxiliar para sus requerimientos
-
+# TODO Realice la importación del mapa linear probing
 
 """
 La vista se encarga de la interacción con el usuario
@@ -71,7 +72,7 @@ def print_menu():
     print("5- Consultar los libros de un autor para un año de publicación especifico")
     print("8- Salir")
 
-def print_book_info(book):
+def print_book_info(book, tiempo_transcurrido, memoria_usada):
     """
     Imprime los mejores libros solicitados
     """
@@ -81,8 +82,10 @@ def print_book_info(book):
                     ' Work text reviews count : ' + book['work_text_reviews_count'])
     else:
         print('No se encontraron libros')
+    print(f"\nTiempo transcurrido: {tiempo_transcurrido:.2f} ms")
+    print(f"Memoria utilizada: {memoria_usada:.2f} kB\n")
 
-def print_books_by_author(author, books_by_author):
+def print_books_by_author(author, books_by_author, tiempo_transcurrido, memoria_usada):
     """
     Recorre la lista de libros de un autor, imprimiendo
     la información solicitada.
@@ -96,8 +99,10 @@ def print_books_by_author(author, books_by_author):
                     ' Work text reviews count : ' + book['work_text_reviews_count'])
     else:
         print("No se encontró el autor")
+    print(f"\nTiempo transcurrido: {tiempo_transcurrido:.2f} ms")
+    print(f"Memoria utilizada: {memoria_usada:.2f} kB\n")
 
-def print_books_by_tag(tag_name, books_by_tag):
+def print_books_by_tag(tag_name, books_by_tag, tiempo_transcurrido, memoria_usada):
     """
     Recorre la lista de libros asociados a un tag, imprimiendo
     la información solicitada.
@@ -111,6 +116,8 @@ def print_books_by_tag(tag_name, books_by_tag):
                     ' Work text reviews count : ' + book['work_text_reviews_count'])
     else:
         print("No se encontró el tag") 
+    print(f"\nTiempo transcurrido: {tiempo_transcurrido:.2f} ms")
+    print(f"Memoria utilizada: {memoria_usada:.2f} kB\n")
         
 def print_books_by_auth_year(author, pub_year, books_by_author_year, tiempo_transcurrido, memoria_usada):
     """
@@ -160,18 +167,18 @@ def main():
 
         elif int(inputs[0]) == 2:
             number = input("Ingrese el id del libro (good_read_book_id) que desea buscar: ")
-            book = logic.get_book_info_by_book_id(control, number)
-            print_book_info(book)
+            book, tiempo_transcurrido, memoria_usada = logic.get_book_info_by_book_id(control, number)
+            print_book_info(book, tiempo_transcurrido, memoria_usada)
 
         elif int(inputs[0]) == 3:
             authorname = input("Nombre del autor a buscar: ")
-            author, author_book_list = logic.get_books_by_author(control, authorname)
-            print_books_by_author(author,author_book_list)
+            author, author_book_list, tiempo_transcurrido, memoria_usada = logic.get_books_by_author(control, authorname)
+            print_books_by_author(author,author_book_list, tiempo_transcurrido, memoria_usada)
 
         elif int(inputs[0]) == 4:
             label = input("Etiqueta a buscar: ")
-            book_list_by_tag = logic.get_books_by_tag(control, label)
-            print_books_by_tag(label, book_list_by_tag)
+            book_list_by_tag, tiempo_transcurrido, memoria_usada = logic.get_books_by_tag(control, label)
+            print_books_by_tag(label, book_list_by_tag, tiempo_transcurrido, memoria_usada)
                  
         elif int(inputs[0]) == 5:
             author_name = input("Ingrese el nombre del autor que desea buscar:\n")
